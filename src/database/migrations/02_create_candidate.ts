@@ -4,6 +4,7 @@ export async function up(knex: Knex): Promise<void> {
   return knex.schema.createTable('candidates', table => {
     table.uuid('id').primary();
     table.string('name').notNullable();
+    table.integer('votes');
     table.string('image').notNullable();
     table.string('short_description').notNullable();
     table.string('description').notNullable();
