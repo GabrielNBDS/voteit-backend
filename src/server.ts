@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import 'express-async-errors';
 import cors from 'cors';
+import path from 'path';
 import * as dotenv from 'dotenv';
 
 import AppError from './Errors/AppError';
@@ -30,6 +31,8 @@ app.use((err: Error, request: Request, response: Response, _: NextFunction) => {
     message: 'Internal Server Error',
   });
 });
+
+app.use('/uploads', express.static(path.resolve(__dirname, '..', 'uploads')));
 
 // eslint-disable-next-line no-console
 app.listen(3333, () => console.log('Server Started'));
