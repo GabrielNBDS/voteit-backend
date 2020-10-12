@@ -15,28 +15,34 @@ class UsersController {
   async create(request: Request, response: Response): Promise<Response> {
     const { name, email, password } = request.body;
 
-    const duplicatedEmail = await knex('users').where('email', email).first();
+    const duplicatedEmail = await knex('users').where({ email }).first();
 
     if (duplicatedEmail) {
-      throw new AppError('Email already taken', 401);
+      throw new AppError('Email already taken', 400);
     }
 
     const hashedPassword = await hash(password, 8);
 
+    const id = uuid();
+
     await knex('users').insert({
-      id: uuid(),
+      id,
       name,
       email,
       password: hashedPassword,
     });
 
-    return response.json({ message: 'user created' });
+    const user = await knex('users').where({ id }).first();
+
+    delete user.password;
+
+    return response.json(user);
   }
 
   async read(request: Request, response: Response): Promise<Response> {
     const { id } = request.user;
 
-    const user: User = await knex.select().from('users').where({ id }).first();
+    const user: User = await knex.from('users').where({ id }).first();
 
     delete user.password;
 
