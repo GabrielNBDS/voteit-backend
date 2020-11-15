@@ -1,0 +1,12 @@
+version: "3.1"
+
+services:
+  voteit_db:
+    image: postgres
+    container_name: voteit
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: voteit
+    ports:
+      - 5432:5432

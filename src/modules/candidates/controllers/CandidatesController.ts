@@ -29,10 +29,12 @@ class CandidatesController {
       short_description,
       description,
       votes: 0,
-      pool_id: id
+      pool_id: id,
     });
 
-    const candidate = await knex('candidates').where({ id: candidate_id}).first();
+    const candidate = await knex('candidates')
+      .where({ id: candidate_id })
+      .first();
 
     return response.json(candidate);
   }
@@ -40,16 +42,23 @@ class CandidatesController {
   async read(request: Request, response: Response): Promise<Response> {
     const { id } = request.query;
 
-    const candidates: Candidate[] = await knex.select().from('candidates').where({ pool_id: id });
+    const candidates: Candidate[] = await knex
+      .select()
+      .from('candidates')
+      .where({ pool_id: id });
 
-    return response.json(candidates);
+    const pool = await knex('pools').select('name', 'id').where({ id }).first();
+
+    return response.json({ candidates, pool });
   }
 
   async update(request: Request, response: Response): Promise<Response> {
     const { id } = request.params;
     const { name, short_description, description } = request.body;
 
-    await knex('candidates').where({ id }).update({ name, short_description, description });
+    await knex('candidates')
+      .where({ id })
+      .update({ name, short_description, description });
 
     const candidate = await knex('candidates').where({ id });
 
@@ -61,7 +70,9 @@ class CandidatesController {
 
     await knex('candidates').where({ id }).increment('votes', 1);
 
-    const candidate = await knex('candidates').where({ id });
+    const candidate = await knex('candidates').where({ id }).first();
+
+    request.io.emit(candidate.pool_id, candidate);
 
     return response.json(candidate);
   }
@@ -71,15 +82,19 @@ class CandidatesController {
     const { filename } = request.file;
 
     const oldImage: Candidate = await knex('candidates').where({ id }).first();
-    let [,,,,name] = oldImage.image.split('/');
+    const [, , , , name] = oldImage.image.split('/');
 
-    fs.unlinkSync(path.resolve(__dirname, '..', '..', '..', '..', 'uploads', name));
+    fs.unlinkSync(
+      path.resolve(__dirname, '..', '..', '..', '..', 'uploads', name),
+    );
 
-    await knex('candidates').where({ id }).update({ image: `http://localhost:3333/uploads/${filename}` });
+    await knex('candidates')
+      .where({ id })
+      .update({ image: `http://localhost:3333/uploads/${filename}` });
 
-    const candidate = await knex('candidates').where({ id });
+    const candidate = await knex('candidates').where({ id }).first();
 
-    return response.json(candidate);
+    return response.json(candidate.image);
   }
 
   async delete(request: Request, response: Response): Promise<Response> {

@@ -27,10 +27,16 @@ class SessionsController {
       expiresIn: '1d',
     });
 
+    delete user.password;
+
     return response.json({
       user,
       token,
     });
+  }
+  
+  async check(request: Request, response: Response): Promise<Response> {
+    return response.json({ authorized: true});
   }
 }
 

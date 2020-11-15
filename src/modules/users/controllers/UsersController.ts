@@ -39,16 +39,6 @@ class UsersController {
     return response.json(user);
   }
 
-  async read(request: Request, response: Response): Promise<Response> {
-    const { id } = request.user;
-
-    const user: User = await knex.from('users').where({ id }).first();
-
-    delete user.password;
-
-    return response.json(user);
-  }
-
   async update(request: Request, response: Response): Promise<Response> {
     const { name, email, password } = request.body;
     const { id } = request.user;

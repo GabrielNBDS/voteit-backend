@@ -9,4 +9,9 @@ const connection = knex({
   useNullAsDefault: true,
 });
 
+// const connection = knex({
+//   client: 'pg',
+//   connection: 'postgres://postgres:docker@localhost:5432/voteit',
+// });
+
 export default connection;

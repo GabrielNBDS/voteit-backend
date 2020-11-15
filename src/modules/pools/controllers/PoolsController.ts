@@ -16,15 +16,19 @@ class PoolsController {
 
     const duplicatedName = await knex('pools').where({ name }).first();
 
+    if (duplicatedName) {
+      throw new AppError('Name already taken');
+    }
+
     const pool_id = uuid();
 
     await knex('pools').insert({
       id: pool_id,
       name,
-      user_id: id
+      user_id: id,
     });
 
-    const pool = await knex('pools').where({ id: pool_id}).first();
+    const pool = await knex('pools').where({ id: pool_id }).first();
 
     return response.json(pool);
   }
@@ -32,7 +36,16 @@ class PoolsController {
   async read(request: Request, response: Response): Promise<Response> {
     const { id } = request.user;
 
-    const pools: Pool[] = await knex.select().from('pools').where({ user_id: id });
+    const pools: Pool[] = await knex
+      .select()
+      .from('pools')
+      .where({ user_id: id });
+
+    return response.json(pools);
+  }
+
+  async index(request: Request, response: Response): Promise<Response> {
+    const pools: Pool[] = await knex.select().from('pools');
 
     return response.json(pools);
   }
