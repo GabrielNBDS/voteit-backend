@@ -18,17 +18,20 @@ candidatesRouter.post(
 );
 candidatesRouter.post('/vote/:id', candidatesController.add_vote);
 candidatesRouter.get('/', candidatesController.read);
+
 candidatesRouter.patch(
   '/:id',
   EnsureAuthentication,
   candidatesController.update,
 );
+
 candidatesRouter.put(
   '/:id',
   upload.single('image'),
   EnsureAuthentication,
   candidatesController.update_image,
 );
+
 candidatesRouter.delete(
   '/:id',
   EnsureAuthentication,

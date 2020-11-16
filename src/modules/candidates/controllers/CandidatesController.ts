@@ -25,7 +25,7 @@ class CandidatesController {
     await knex('candidates').insert({
       id: candidate_id,
       name,
-      image: `http://localhost:3333/uploads/${filename}`,
+      image: `https://voteit-bucket.s3.us-east-2.amazonaws.com/${filename}`,
       short_description,
       description,
       votes: 0,
@@ -90,7 +90,9 @@ class CandidatesController {
 
     await knex('candidates')
       .where({ id })
-      .update({ image: `http://localhost:3333/uploads/${filename}` });
+      .update({
+        image: `https://voteit-bucket.s3.us-east-2.amazonaws.com/${filename}`,
+      });
 
     const candidate = await knex('candidates').where({ id }).first();
 
