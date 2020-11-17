@@ -54,17 +54,6 @@ jobs:
           script: |
             cd ~/app/voteit-backend
             yarn 
-
-      - name: Run migrations
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          port: ${{ secrets.SSH_PORT }}
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            cd ~/app/voteit-backend
-            knex --knexfile knexfile.ts migrate:latest
             
 
       - name: Restart server
