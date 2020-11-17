@@ -16,7 +16,8 @@ import path from 'path';
 
 module.exports = {
   client: 'pg',
-  connection: 'postgres://postgres:docker@localhost:5432/voteit',
+  connection:
+    'postgres://postgres:d41d8cd98f00b204e9800998ecf8427e@localhost:35432/voteit',
   migrations: {
     directory: path.resolve(__dirname, 'src', 'database', 'migrations'),
   },

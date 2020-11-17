@@ -18,14 +18,14 @@ class CandidatesController {
   async create(request: Request, response: Response): Promise<Response> {
     const { id } = request.params;
     const { name, short_description, description } = request.body;
-    const { filename } = request.file;
+    const { location } = request.file;
 
     const candidate_id = uuid();
 
     await knex('candidates').insert({
       id: candidate_id,
       name,
-      image: `https://voteit-bucket.s3.us-east-2.amazonaws.com/${filename}`,
+      image: location,
       short_description,
       description,
       votes: 0,
@@ -79,7 +79,7 @@ class CandidatesController {
 
   async update_image(request: Request, response: Response): Promise<Response> {
     const { id } = request.params;
-    const { filename } = request.file;
+    const { location } = request.file;
 
     const oldImage: Candidate = await knex('candidates').where({ id }).first();
     const [, , , , name] = oldImage.image.split('/');
@@ -88,11 +88,9 @@ class CandidatesController {
       path.resolve(__dirname, '..', '..', '..', '..', 'uploads', name),
     );
 
-    await knex('candidates')
-      .where({ id })
-      .update({
-        image: `https://voteit-bucket.s3.us-east-2.amazonaws.com/${filename}`,
-      });
+    await knex('candidates').where({ id }).update({
+      image: location,
+    });
 
     const candidate = await knex('candidates').where({ id }).first();
 
