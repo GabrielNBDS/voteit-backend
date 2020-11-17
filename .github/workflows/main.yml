@@ -64,7 +64,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd ~/app/voteit-backend
-            yarn knex:migrate 
+            knex --knexfile knexfile.ts migrate:latest
             
 
       - name: Restart server
