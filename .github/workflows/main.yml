@@ -44,7 +44,7 @@ jobs:
           source: "., !node_modules"
           target: "~/app/voteit-backend"
           
-      - name: Install dependencies in digital ocean
+      - name: Install dependencies in digital ocean and restart the server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -54,24 +54,5 @@ jobs:
           script: |
             cd ~/app/voteit-backend
             yarn 
-
-      - name: Run migrations
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          port: ${{ secrets.SSH_PORT }}
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            cd ~/app/voteit-backend
-            yarn knex:migrate 
-            
-
-      - name: Restart server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          port: ${{ secrets.SSH_PORT }}
-          key: ${{ secrets.SSH_KEY }}
-          script: pm2 restart voteit-server
+            yarn knex:migrate
+            pm2 restart 0
