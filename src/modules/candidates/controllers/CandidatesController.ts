@@ -1,8 +1,10 @@
 import { Request, Response } from 'express';
 import { uuid } from 'uuidv4';
-import fs from 'fs';
-import path from 'path';
+import aws from 'aws-sdk';
+
 import knex from '../../../database/connection';
+
+const s3 = new aws.S3();
 
 interface Candidate {
   id: string;
@@ -81,12 +83,25 @@ class CandidatesController {
     const { id } = request.params;
     const { location } = request.file;
 
-    const oldImage: Candidate = await knex('candidates').where({ id }).first();
-    const [, , , , name] = oldImage.image.split('/');
+    const { image } = await knex
+      .select('image')
+      .from('candidates')
+      .where({ id })
+      .first();
 
-    fs.unlinkSync(
-      path.resolve(__dirname, '..', '..', '..', '..', 'uploads', name),
-    );
+    s3.deleteObject({
+      Bucket: 'voteit-bucket',
+      Key: image.replace('https://voteit-bucket.s3.amazonaws.com/', ''),
+    })
+      .promise()
+      .then(r => {
+        // eslint-disable-next-line no-console
+        console.log(r);
+      })
+      .catch(r => {
+        // eslint-disable-next-line no-console
+        console.log(r);
+      });
 
     await knex('candidates').where({ id }).update({
       image: location,
@@ -99,6 +114,26 @@ class CandidatesController {
 
   async delete(request: Request, response: Response): Promise<Response> {
     const { id } = request.params;
+
+    const { image } = await knex
+      .select('image')
+      .from('candidates')
+      .where({ id })
+      .first();
+
+    s3.deleteObject({
+      Bucket: 'voteit-bucket',
+      Key: image.replace('https://voteit-bucket.s3.amazonaws.com/', ''),
+    })
+      .promise()
+      .then(r => {
+        // eslint-disable-next-line no-console
+        console.log(r);
+      })
+      .catch(r => {
+        // eslint-disable-next-line no-console
+        console.log(r);
+      });
 
     await knex('candidates').where({ id }).del();
 
