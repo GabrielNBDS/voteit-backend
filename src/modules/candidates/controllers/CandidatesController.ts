@@ -89,19 +89,28 @@ class CandidatesController {
       .where({ id })
       .first();
 
-    s3.deleteObject({
-      Bucket: 'voteit-bucket',
-      Key: image.replace('https://voteit-bucket.s3.amazonaws.com/', ''),
-    })
-      .promise()
-      .then(r => {
-        // eslint-disable-next-line no-console
-        console.log(r);
-      })
-      .catch(r => {
-        // eslint-disable-next-line no-console
-        console.log(r);
-      });
+    s3.deleteObject(
+      {
+        Bucket: 'voteit-bucket',
+        Key: image.replace('https://voteit-bucket.s3.amazonaws.com/', ''),
+      },
+      (err, data) => {
+        if (err) {
+          // eslint-disable-next-line no-console
+          console.log(err, err.stack);
+
+          // an error occurred
+        } else {
+          // eslint-disable-next-line no-console
+          console.log(
+            data,
+            image.replace('https://voteit-bucket.s3.amazonaws.com/', ''),
+          );
+
+          // successful response
+        }
+      },
+    );
 
     await knex('candidates').where({ id }).update({
       image: location,
