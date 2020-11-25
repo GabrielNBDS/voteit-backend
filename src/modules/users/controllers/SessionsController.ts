@@ -34,9 +34,9 @@ class SessionsController {
       token,
     });
   }
-  
+
   async check(request: Request, response: Response): Promise<Response> {
-    return response.json({ authorized: true});
+    return response.json({ authorized: true });
   }
 }
 

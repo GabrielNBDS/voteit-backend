@@ -4,13 +4,6 @@ import { hash } from 'bcryptjs';
 import knex from '../../../database/connection';
 import AppError from '../../../Errors/AppError';
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  password?: string;
-}
-
 class UsersController {
   async create(request: Request, response: Response): Promise<Response> {
     const { name, email, password } = request.body;
