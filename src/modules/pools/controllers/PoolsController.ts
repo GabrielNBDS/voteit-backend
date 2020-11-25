@@ -44,12 +44,6 @@ class PoolsController {
     return response.json(pools);
   }
 
-  async index(request: Request, response: Response): Promise<Response> {
-    const pools: Pool[] = await knex.select().from('pools');
-
-    return response.json(pools);
-  }
-
   async update(request: Request, response: Response): Promise<Response> {
     const { id } = request.params;
     const { name } = request.body;
