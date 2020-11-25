@@ -72,34 +72,22 @@ class PoolsController {
 
     if (candidates.length > 0) {
       for (let i = 0; i < candidates.length; i++) {
-        s3.deleteObject(
-          {
-            Bucket: 'voteit-bucket',
-            Key: candidates[i].image.replace(
-              'https://voteit-bucket.s3.amazonaws.com/',
-              '',
-            ),
-          },
-          (err, data) => {
-            if (err) {
-              // eslint-disable-next-line no-console
-              console.log(err, err.stack);
-
-              // an error occurred
-            } else {
-              // eslint-disable-next-line no-console
-              console.log(
-                data,
-                candidates[i].image.replace(
-                  'https://voteit-bucket.s3.amazonaws.com/',
-                  '',
-                ),
-              );
-
-              // successful response
-            }
-          },
-        );
+        s3.deleteObject({
+          Bucket: 'voteit-bucket',
+          Key: candidates[i].image.replace(
+            'https://voteit-bucket.s3.amazonaws.com/',
+            '',
+          ),
+        })
+          .promise()
+          .then(() => {
+            // eslint-disable-next-line no-console
+            console.log('deleted');
+          })
+          .catch(err => {
+            // eslint-disable-next-line no-console
+            console.log(`error: ${err}`);
+          });
       }
     }
 

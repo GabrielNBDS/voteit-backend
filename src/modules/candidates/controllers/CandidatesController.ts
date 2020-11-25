@@ -89,28 +89,19 @@ class CandidatesController {
       .where({ id })
       .first();
 
-    s3.deleteObject(
-      {
-        Bucket: 'voteit-bucket',
-        Key: image.replace('https://voteit-bucket.s3.amazonaws.com/', ''),
-      },
-      (err, data) => {
-        if (err) {
-          // eslint-disable-next-line no-console
-          console.log(err, err.stack);
-
-          // an error occurred
-        } else {
-          // eslint-disable-next-line no-console
-          console.log(
-            data,
-            image.replace('https://voteit-bucket.s3.amazonaws.com/', ''),
-          );
-
-          // successful response
-        }
-      },
-    );
+    s3.deleteObject({
+      Bucket: 'voteit-bucket',
+      Key: image.replace('https://voteit-bucket.s3.amazonaws.com/', ''),
+    })
+      .promise()
+      .then(() => {
+        // eslint-disable-next-line no-console
+        console.log('deleted');
+      })
+      .catch(err => {
+        // eslint-disable-next-line no-console
+        console.log(`error: ${err}`);
+      });
 
     await knex('candidates').where({ id }).update({
       image: location,
@@ -135,13 +126,13 @@ class CandidatesController {
       Key: image.replace('https://voteit-bucket.s3.amazonaws.com/', ''),
     })
       .promise()
-      .then(r => {
+      .then(() => {
         // eslint-disable-next-line no-console
-        console.log(r);
+        console.log('deleted');
       })
-      .catch(r => {
+      .catch(err => {
         // eslint-disable-next-line no-console
-        console.log(r);
+        console.log(`error: ${err}`);
       });
 
     await knex('candidates').where({ id }).del();
