@@ -1,12 +1,19 @@
 import { Request, Response } from 'express';
 import { uuid } from 'uuidv4';
+import aws from 'aws-sdk';
 import knex from '../../../database/connection';
 import AppError from '../../../Errors/AppError';
+
+const s3 = new aws.S3();
 
 interface Pool {
   id: string;
   name: string;
   user_id: string;
+}
+
+interface Candidate {
+  image: string;
 }
 
 class PoolsController {
@@ -57,6 +64,44 @@ class PoolsController {
 
   async delete(request: Request, response: Response): Promise<Response> {
     const { id } = request.params;
+
+    const candidates: Candidate[] = await knex
+      .select()
+      .from('candidates')
+      .where({ pool_id: id });
+
+    if (candidates.length > 0) {
+      for (let i = 0; i < candidates.length; i++) {
+        s3.deleteObject(
+          {
+            Bucket: 'voteit-bucket',
+            Key: candidates[i].image.replace(
+              'https://voteit-bucket.s3.amazonaws.com/',
+              '',
+            ),
+          },
+          (err, data) => {
+            if (err) {
+              // eslint-disable-next-line no-console
+              console.log(err, err.stack);
+
+              // an error occurred
+            } else {
+              // eslint-disable-next-line no-console
+              console.log(
+                data,
+                candidates[i].image.replace(
+                  'https://voteit-bucket.s3.amazonaws.com/',
+                  '',
+                ),
+              );
+
+              // successful response
+            }
+          },
+        );
+      }
+    }
 
     await knex('pools').where({ id }).del();
 
